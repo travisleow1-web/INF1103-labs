@@ -37,3 +37,19 @@ print("day 3:" ,followers)
 
 #2A) We do not need to manually reassign the value of followers each time we want to change it. Instead, we can use the += and -= operators to modify the value of followers based on the current value. This makes the code more efficient and easier to read.
 #2B) It will affect the existing value of followers by adding or subtracting the specified amount, rather than replacing the entire value with a new one. This allows for more dynamic updates to the variable based on user interactions or other events in the program.
+
+#Activity 4:
+#1
+username = input("Enter your username: ")
+age = input("Enter your Age: ")
+category = input("Enter Content category: ")
+
+print("\nInstagram Profile")
+print ("================")
+print("Username: " ,username)
+print("Age: " ,age)
+print("Category: " ,category)
+
+#2A) The input() function is used to take user input in the form of a string. It allows the program to prompt the user for information and store it in a variable for later use.
+#2B) The program is now dynamic, allowing users to input their own information instead of using hardcoded values. This makes the program more interactive and personalized for each user.
+#2C) Having ran the program with different inputs, we can see that the output changes based on the user's input. For example, if the user enters a different username, age, or category, the output will reflect those changes accordingly.
