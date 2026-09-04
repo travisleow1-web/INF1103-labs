@@ -23,3 +23,17 @@ print("Bio: " ,bio)
 print("Followers: " ,followers)
 #2A) The use of having variables in this code is to store information about the user, such as their username, bio, and number of followers. This allows for easy access and modification of these values throughout the program.
 #2B) If we are talking about the code stored inside the variables, when we change the value of the variables, the output when using said variables would change.
+
+#Activity 3:
+#1 
+followers += 50
+print("day 1:" ,followers)
+
+followers += 20
+print("day 2:" ,followers)
+
+followers -= 10
+print("day 3:" ,followers)
+
+#2A) We do not need to manually reassign the value of followers each time we want to change it. Instead, we can use the += and -= operators to modify the value of followers based on the current value. This makes the code more efficient and easier to read.
+#2B) It will affect the existing value of followers by adding or subtracting the specified amount, rather than replacing the entire value with a new one. This allows for more dynamic updates to the variable based on user interactions or other events in the program.
