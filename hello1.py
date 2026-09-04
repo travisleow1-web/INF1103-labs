@@ -53,3 +53,32 @@ print("Category: " ,category)
 #2A) The input() function is used to take user input in the form of a string. It allows the program to prompt the user for information and store it in a variable for later use.
 #2B) The program is now dynamic, allowing users to input their own information instead of using hardcoded values. This makes the program more interactive and personalized for each user.
 #2C) Having ran the program with different inputs, we can see that the output changes based on the user's input. For example, if the user enters a different username, age, or category, the output will reflect those changes accordingly.
+
+#Activity 5:
+#1
+username = input("Enter your username: ")
+age = int(input("Enter your Age: "))
+category = input("Enter Content category: ")
+
+print("\nInstagram Profile")
+print ("================")
+print("Username: " ,username)
+print("Age: " ,age)
+print("Category: " ,category)
+
+if age>40 and category =="fun":
+    print("You are old what is fun for you??")
+
+#2 
+#Instagram Profile
+#================
+#Username:  Nisha
+#Age:  41
+#Category:  fun
+#You are too old what is fun for you??
+
+#3
+#a1) The input() function is used to take user input in the form of a string. It allows the program to prompt the user for information and store it in a variable for later use.
+#a2) The int() function is used to convert a string input into an integer. This is necessary when we want to perform numerical operations or comparisons with the input value, such as checking if the age is greater than 40 in this case.
+#b) The if statement is used to make decisions in the code based on certain conditions. In this case, it checks if the age is greater than 40 and if the category is "fun". If both conditions are true, it executes the code block inside the if statement, which prints a message to the user. This allows for dynamic responses based on user input.
+
