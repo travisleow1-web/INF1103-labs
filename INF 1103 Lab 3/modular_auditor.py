@@ -67,4 +67,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-#Step 4 User Input Validation and Error Handling
+#Step 5 Printing total deliveries and or failed attempts is already handled in the generate_report function, which is called at the end of the main function. The report includes the total units processed and the number of failed/rejected entries.
