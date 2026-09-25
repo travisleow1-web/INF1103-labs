@@ -1,82 +1,85 @@
 import os
 
-FILENAME = "inventory.txt"
-OVERSTOCK_LIMIT = 500
+FILENAME = "orders.txt"
 
-def load_inventory(filename=FILENAME):
+# Standard item catalog (IDs 1001 to 1003)
+DEFAULT_CATALOG = [
+    {"id": 1001, "name": "Wireless Mouse", "quantity": 0},
+    {"id": 1002, "name": "Keyboard", "quantity": 0},
+    {"id": 1003, "name": "USB Cable", "quantity": 0}
+]
+
+def load_orders(filename=FILENAME):
     """
-    Reads transaction amounts from the inventory file.
-    If the file does not exist, returns an empty list.
+    Loads existing orders from disk. If no file exists,
+    initializes the standard catalog (1001-1003) with 0 quantities[cite: 7].
     """
-    history = []
+    orders = []
     if os.path.exists(filename):
-        try:
-            with open(filename, "r") as file:
-                for line in file:
-                    line = line.strip()
-                    if line.isdigit():
-                        history.append(int(line))
-        except Exception as e:
-            print(f"Error reading {filename}: {e}")
-    else:
-        print(f"No existing {filename} found. Starting with empty inventory.")
+        with open(filename, "r") as file:
+            for line in file:
+                line = line.strip()
+                if line:
+                    parts = line.split(",")
+                    if len(parts) == 3:
+                        orders.append({
+                            "id": int(parts[0].strip()),
+                            "name": parts[1].strip(),
+                            "quantity": int(parts[2].strip())
+                        })
     
-    return history
+    # Fallback if file is missing or empty
+    if not orders:
+        orders = [dict(item) for item in DEFAULT_CATALOG]
+        
+    return orders
 
 
-def save_inventory(history, filename=FILENAME):
+def display_orders(orders):
     """
-    Saves the list of transaction history entries to disk.
+    Prints current active order totals[cite: 7].
     """
-    try:
-        with open(filename, "w") as file:
-            for item in history:
-                file.write(f"{item}\n")
-        print(f"\nOrder/inventory successfully saved to {filename}")
-    except Exception as e:
-        print(f"Error saving to {filename}: {e}")
+    print("Current Orders:\n")
+    for item in orders:
+        print(f"{item['id']}, {item['name']}, {item['quantity']}")
+    print()
+
+
+def save_orders(orders, filename=FILENAME):
+    """
+    Writes updated order totals back to orders.txt[cite: 7].
+    """
+    with open(filename, "w") as file:
+        for item in orders:
+            file.write(f"{item['id']},{item['name']},{item['quantity']}\n")
+            
+    print(f"\nOrder successfully saved to {filename}")
 
 
 def main():
-    # 1. Load history (starts at [] and count 0 if file is missing)[cite: 5]
-    history = load_inventory(FILENAME)
-    failed_entries = 0
-    
-    running_total = sum(history)
-    print(f"Current Inventory Count: {running_total}\n")
+    # 1. Load initial state
+    orders = load_orders(FILENAME)
+    display_orders(orders)
 
-    # 2. Input loop
-    while True:
-        user_input = input("Enter stock quantity (or 'quit' to exit): ").strip()
-        
-        if user_input.lower() == "quit":
-            break
-            
-        if not user_input.isdigit():
-            print("Invalid input! Please enter a valid non-negative integer.")
-            failed_entries += 1
-            continue
-            
-        amount = int(user_input)
-        history.append(amount)
-        running_total += amount
-        print(f"Added {amount} units. Current Total: {running_total}")
-        
-        if running_total > OVERSTOCK_LIMIT:
-            print(f"\nALERT: Overstock limit of {OVERSTOCK_LIMIT} reached!")
-            break
-
-    # 3. Save to file on exit[cite: 5]
-    save_inventory(history, FILENAME)
+    print("--- Enter order quantities for each product ---")
     
-    # 4. Final summary
-    print("\n--- FINAL REPORT ---")
-    print(f"Total Transactions Processed: {len(history)}")
-    print(f"Total Units in Inventory:    {sum(history)}")
-    print(f"Failed Entries:              {failed_entries}")
+    # 2. Cycle automatically through each item (1001 -> 1002 -> 1003)
+    for item in orders:
+        user_input = input(f"Enter Quantity for {item['name']} (ID {item['id']}): ").strip()
+        
+        # Safely convert input to int; default to 0 if empty/invalid
+        added_quantity = int(user_input) if user_input.isdigit() else 0
+        
+        # Update running quantity for this item
+        item["quantity"] += added_quantity
+
+    # 3. Display updated totals
+    print("\nUpdated Summary:")
+    display_orders(orders)
+
+    # 4. Persist to file
+    save_orders(orders, FILENAME)
 
 
 if __name__ == "__main__":
     main()
-
-#commit 5, Realligned the functions to match lesson materials instead of previous lessons. 
