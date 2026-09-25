@@ -1,4 +1,3 @@
-
 import os
 
 FILENAME = "inventory.txt"
@@ -6,8 +5,8 @@ OVERSTOCK_LIMIT = 500
 
 def load_inventory(filename=FILENAME):
     """
-    Loads transaction history from the inventory file if it exists.
-    Returns a list of transaction integers.
+    Reads transaction amounts from the inventory file.
+    If the file does not exist, returns an empty list.
     """
     history = []
     if os.path.exists(filename):
@@ -17,92 +16,67 @@ def load_inventory(filename=FILENAME):
                     line = line.strip()
                     if line.isdigit():
                         history.append(int(line))
-            print(f"Successfully loaded {len(history)} previous transaction(s) from {filename}.")
         except Exception as e:
-            print(f"Warning: Could not read {filename} ({e}). Starting with empty inventory.")
+            print(f"Error reading {filename}: {e}")
     else:
-        print(f"No existing {filename} found. Starting with a fresh inventory.")
+        print(f"No existing {filename} found. Starting with empty inventory.")
     
     return history
 
 
 def save_inventory(history, filename=FILENAME):
     """
-    Saves all transaction history amounts to the inventory file.
+    Saves the list of transaction history entries to disk.
     """
     try:
         with open(filename, "w") as file:
             for item in history:
                 file.write(f"{item}\n")
-        print(f"\nInventory history successfully saved to {filename}")
+        print(f"\nOrder/inventory successfully saved to {filename}")
     except Exception as e:
-        print(f"Error: Failed to write to {filename}: {e}")
-
-
-def get_valid_input():
-    """
-    Prompts the user for a stock quantity or 'quit'.
-    Returns the lowercased string 'quit', an integer value, or None if invalid.
-    """
-    user_input = input("Enter stock quantity (or 'quit' to exit): ").strip()
-    
-    if user_input.lower() == "quit":
-        return "quit"
-    
-    if user_input.isdigit():
-        value = int(user_input)
-        if value >= 0:
-            return value
-    
-    return None
+        print(f"Error saving to {filename}: {e}")
 
 
 def main():
-    print("=== Modular Inventory Auditor (Persistent) ===")
-    
-    # 1. Load existing transaction history from file
+    # 1. Load history (starts at [] and count 0 if file is missing)[cite: 5]
     history = load_inventory(FILENAME)
     failed_entries = 0
     
-    # Calculate current starting total from existing history
     running_total = sum(history)
-    print(f"Current Starting Total: {running_total} units\n")
-    
-    # 2. Main execution loop
+    print(f"Current Inventory Count: {running_total}\n")
+
+    # 2. Input loop
     while True:
-        entry = get_valid_input()
+        user_input = input("Enter stock quantity (or 'quit' to exit): ").strip()
         
-        if entry == "quit":
-            print("\nExiting audit routine...")
+        if user_input.lower() == "quit":
             break
-        
-        if entry is None:
-            print("Invalid entry! Please enter a non-negative integer.")
+            
+        if not user_input.isdigit():
+            print("Invalid input! Please enter a valid non-negative integer.")
             failed_entries += 1
             continue
+            
+        amount = int(user_input)
+        history.append(amount)
+        running_total += amount
+        print(f"Added {amount} units. Current Total: {running_total}")
         
-        # Track valid transaction in history list and update running total
-        history.append(entry)
-        running_total += entry
-        print(f"Added {entry} units. Current Total: {running_total}")
-        
-        # Enforce business rule: Overstock alert at 500 units
         if running_total > OVERSTOCK_LIMIT:
-            print(f"\nALERT: Overstock limit reached ({running_total} > {OVERSTOCK_LIMIT} units)!")
+            print(f"\nALERT: Overstock limit of {OVERSTOCK_LIMIT} reached!")
             break
 
-    # 3. Save updated history to disk
+    # 3. Save to file on exit[cite: 5]
     save_inventory(history, FILENAME)
     
-    # 4. Final Reporting
-    print("\n--- FINAL AUDIT REPORT ---")
-    print(f"Total Transactions Recorded: {len(history)}")
-    print(f"Total Units Processed:      {sum(history)}")
-    print(f"Failed/Rejected Entries:   {failed_entries}")
-    print("---------------------------")
+    # 4. Final summary
+    print("\n--- FINAL REPORT ---")
+    print(f"Total Transactions Processed: {len(history)}")
+    print(f"Total Units in Inventory:    {sum(history)}")
+    print(f"Failed Entries:              {failed_entries}")
 
 
 if __name__ == "__main__":
     main()
 
-# Commit 4
+#commit 5, Realligned the functions to match lesson materials instead of previous lessons. 
