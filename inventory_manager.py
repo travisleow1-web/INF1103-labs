@@ -13,8 +13,8 @@ def load_inventory():
                 inventory = json.load(file)
             print("Inventory loaded successfully.")
             return inventory
-        except json.JSONDecodeError:
-            print("Error parsing inventory.json. Starting with empty inventory.")
+        except (json.JSONDecodeError, Exception) as e:
+            print(f"Error reading {FILENAME}: {e}. Starting with empty inventory.")
             return {}
     else:
         print(f"{FILENAME} not found. Starting with empty inventory.")
@@ -28,56 +28,95 @@ def save_inventory(inventory, is_exit=False):
     else:
         print("Saving inventory...")
 
-    with open(FILENAME, "w") as file:
-        json.dump(inventory, file, indent=4)
+    try:
+        with open(FILENAME, "w") as file:
+            json.dump(inventory, file, indent=4)
 
-    if is_exit:
-        print("Inventory saved successfully.")
-    else:
-        print(f"Inventory saved successfully to {FILENAME}.")
+        if is_exit:
+            print("Inventory saved successfully.")
+        else:
+            print(f"Inventory saved successfully to {FILENAME}.")
+    except Exception as e:
+        print(f"Failed to save inventory: {e}")
 
 
 def display_all(inventory):
-    """Displays all products in formatted structure."""
+    """Displays all products in formatted structure with validation."""
     print("Current Inventory")
     print("-" * 48)
     if not inventory:
-        print("Inventory is currently empty.")
+        print("No products currently in inventory.")
+        print("Use Option 2 (Add Product) to add items to your inventory.")
     else:
         for p_id, item in inventory.items():
-            price = float(item["price"])
-            stock = int(item["stock"])
-            print(
-                f"ID: {p_id} | Name: {item['name']} | Price: ${price:.2f} | Stock: {stock}"
-            )
+            try:
+                price = float(item.get("price", 0))
+                stock = int(item.get("stock", 0))
+                name = item.get("name", "Unknown")
+                print(
+                    f"ID: {p_id} | Name: {name} | Price: ${price:.2f} | Stock: {stock}"
+                )
+            except (ValueError, TypeError):
+                print(f"ID: {p_id} | [Error: Corrupted product data format]")
     print("-" * 48)
 
 
+def get_non_empty_string(prompt):
+    """Ensures user enters a non-empty string."""
+    while True:
+        value = input(prompt).strip()
+        if value:
+            return value
+        print("Input cannot be empty. Please try again.")
+
+
+def get_valid_float(prompt):
+    """Validates numeric price input."""
+    while True:
+        try:
+            value = float(input(prompt))
+            if value < 0:
+                print("Price cannot be negative. Please try again.")
+                continue
+            return value
+        except ValueError:
+            print("Invalid input. Please enter a valid decimal number (e.g. 29.99).")
+
+
+def get_valid_int(prompt):
+    """Validates integer stock input."""
+    while True:
+        try:
+            value = int(input(prompt))
+            if value < 0:
+                print("Stock quantity cannot be negative. Please try again.")
+                continue
+            return value
+        except ValueError:
+            print("Invalid input. Please enter a valid whole number (e.g. 10).")
+
+
 def add_product(inventory):
-    """Adds a new product item to the inventory dictionary."""
+    """Adds a new product item with input validation."""
     print("Add New Product")
-    p_id = input("Product ID: ").strip()
+    p_id = get_non_empty_string("Product ID: ")
 
     if p_id in inventory:
-        print("Product ID already exists!")
+        print("Error: Product ID already exists!")
         return
 
-    name = input("Product Name: ").strip()
-    try:
-        price = float(input("Price: "))
-        stock = int(input("Stock Quantity: "))
-    except ValueError:
-        print("Invalid input for price or stock. Addition canceled.")
-        return
+    name = get_non_empty_string("Product Name: ")
+    price = get_valid_float("Price: ")
+    stock = get_valid_int("Stock Quantity: ")
 
     inventory[p_id] = {"name": name, "price": price, "stock": stock}
     print("Product added successfully!")
 
 
 def update_stock(inventory):
-    """Updates stock quantity for an existing product."""
+    """Updates stock quantity for an existing product with validation."""
     print("Update Stock")
-    p_id = input("Enter Product ID: ").strip()
+    p_id = get_non_empty_string("Enter Product ID: ")
 
     if p_id not in inventory:
         print("Product not found.")
@@ -88,29 +127,30 @@ def update_stock(inventory):
     print(f"Name: {item['name']}")
     print(f"Current Stock: {item['stock']}")
 
-    try:
-        new_stock = int(input("New Stock Quantity: "))
-        inventory[p_id]["stock"] = new_stock
-        print("Stock updated successfully!")
-    except ValueError:
-        print("Invalid stock number. Update canceled.")
+    new_stock = get_valid_int("New Stock Quantity: ")
+    inventory[p_id]["stock"] = new_stock
+    print("Stock updated successfully!")
 
 
 def search_product(inventory):
     """Searches for a specific product by ID."""
     print("Search Product")
-    p_id = input("Enter Product ID: ").strip()
+    p_id = get_non_empty_string("Enter Product ID: ")
 
     if p_id in inventory:
         item = inventory[p_id]
-        price = float(item["price"])
-        print("Product Found")
-        print("-" * 48)
-        print(f"ID: {p_id}")
-        print(f"Name: {item['name']}")
-        print(f"Price: ${price:.2f}")
-        print(f"Stock: {item['stock']}")
-        print("-" * 48)
+        try:
+            price = float(item["price"])
+            stock = int(item["stock"])
+            print("Product Found")
+            print("-" * 48)
+            print(f"ID: {p_id}")
+            print(f"Name: {item['name']}")
+            print(f"Price: ${price:.2f}")
+            print(f"Stock: {stock}")
+            print("-" * 48)
+        except (ValueError, TypeError):
+            print("Error: Product data is corrupted.")
     else:
         print("Product not found.")
 
