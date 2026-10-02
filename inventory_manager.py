@@ -195,3 +195,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+#Product not found issue has been rectified by ensuring that the product ID is checked against the inventory dictionary. The search_product function now correctly verifies if the product ID exists and handles cases where the product data may be corrupted.
