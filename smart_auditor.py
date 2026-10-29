@@ -1,4 +1,7 @@
 
+import json
+import os
+
 class Product:
     def __init__(self, product_id, name, price, stock):
         self._product_id = product_id
@@ -39,3 +42,27 @@ class Inventory:
         else:
             for p in self.products:
                 p.display_information()
+
+
+
+def load_inventory(filename="inventory.json"):
+    inventory = Inventory()
+    if os.path.exists(filename):
+        with open(filename, 'r') as file:
+            try:
+                data = json.load(file)
+                for item in data:
+                    prod = Product(item['product_id'], item['name'], item['price'], item['stock'])
+                    inventory.add_product(prod)
+                print("Inventory loaded successfully.")
+            except json.JSONDecodeError:
+                print("Error reading the JSON file. Starting with an empty inventory.")
+    else:
+        print("No existing inventory file found. Starting fresh.")
+    return inventory
+
+def save_inventory(inventory, filename="inventory.json"):
+    data = [p.to_dict() for p in inventory.products]
+    with open(filename, 'w') as file:
+        json.dump(data, file, indent=4)
+    print("Inventory saved successfully.")
