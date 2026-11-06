@@ -43,9 +43,11 @@ class PhysicalProduct(Product, CanBeShipped):
     def display_information(self):
         print(f"ID: {self._product_id} | Name: {self.name} | Price: ${self._price:.2f} | Stock: {self._stock}", end ="")
 
+    def get_fulfilment_info(self) -> str:
+        return f"Product requires physical shipping. Weight: {self._weight} kg"
 
     def get_fulfillment_info(self) -> str:
-        return f"Product requires physical shipping. Weight: {self._weight} kg" 
+        return self.get_fulfilment_info()
 
     def calculate_shipping_cost(self) -> float:
         base_cost = 5.0  # Base shipping cost
@@ -53,8 +55,8 @@ class PhysicalProduct(Product, CanBeShipped):
         return base_cost + (cost_per_kg * self._weight)
 
     def to_dict(self) -> dict:
-        return{
-            "type": "physical", 
+        return {
+            "type": "physical",
             "product_id": self._product_id,
             "name": self.name,
             "price": self._price,
@@ -62,26 +64,30 @@ class PhysicalProduct(Product, CanBeShipped):
             "weight": self._weight
         }
 
-    class DigitalProduct(Product):
-        def __init__(self, product_id: str, name: str, price: float, stock: int, download_size: float):
-            super().__init__(product_id, name, price, stock)
-            self.download_size = float(download_size)  # Size in MB
 
-        def display_information(self) -> None:
-            print(f" | Download Size: {self.download_size}MB", end=" ")
+class DigitalProduct(Product):
+    def __init__(self, product_id: str, name: str, price: float, stock: int, download_size: float):
+        super().__init__(product_id, name, price, stock)
+        self.download_size = float(download_size)  # Size in MB
 
-        def get_fulfillment_info(self) -> str:
-            return f"Product is digital and can be delivered electronically. No shipping required, download size: {self.download_size} MB"
+    def display_information(self) -> None:
+        print(f" | Download Size: {self.download_size}MB", end=" ")
 
-        def to_dict(self) -> dict:
-            return {
-                "type": "digital",
-                "product_id": self._product_id,
-                "name": self.name,
-                "price": self._price,
-                "stock": self._stock,
-                "download_size": self.download_size
-            }
+    def get_fulfilment_info(self) -> str:
+        return f"Product is digital and can be delivered electronically. No shipping required, download size: {self.download_size} MB"
+
+    def get_fulfillment_info(self) -> str:
+        return self.get_fulfilment_info()
+
+    def to_dict(self) -> dict:
+        return {
+            "type": "digital",
+            "product_id": self._product_id,
+            "name": self.name,
+            "price": self._price,
+            "stock": self._stock,
+            "download_size": self.download_size
+        }
 
 class Inventory:
     def __init__(self):
@@ -90,7 +96,7 @@ class Inventory:
     def add_product(self, product):
         self.products.append(product)
 
-    def search_product(self, product_id):
+    def search_product(self, product_id:str):
         for p in self.products:
             if p._product_id == product_id:
                 return p
@@ -105,14 +111,17 @@ class Inventory:
 
 
 
-def load_inventory(filename="inventory.json"):
+def load_inventory(filename="inventory.json")-> Inventory:
     inventory = Inventory()
     if os.path.exists(filename):
         with open(filename, 'r') as file:
             try:
                 data = json.load(file)
                 for item in data:
-                    prod = Product(item['product_id'], item['name'], item['price'], item['stock'])
+                    if item['type'] == 'physical':
+                        prod = Product(item['product_id'], item['name'], item['price'], item['stock'], item.get('weight', 0.0))
+                    elif item['type'] == 'digital':
+                        prod = DigitalProduct(item['product_id'], item['name'], item['price'], item['stock'], item.get('download_size', 0.0))
                     inventory.add_product(prod)
                 print("Inventory loaded successfully.")
             except json.JSONDecodeError:
