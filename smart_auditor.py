@@ -47,6 +47,10 @@ class PhysicalProduct(Product, CanBeShipped):
     def get_fulfillment_info(self) -> str:
         return f"Product requires physical shipping. Weight: {self._weight} kg" 
 
+    def calculate_shipping_cost(self) -> float:
+        base_cost = 5.0  # Base shipping cost
+        cost_per_kg = 2.0  # Cost per kg
+        return base_cost + (cost_per_kg * self._weight)
 
     def to_dict(self) -> dict:
         return{
@@ -57,6 +61,27 @@ class PhysicalProduct(Product, CanBeShipped):
             "stock": self._stock,
             "weight": self._weight
         }
+
+    class DigitalProduct(Product):
+        def __init__(self, product_id: str, name: str, price: float, stock: int, download_size: float):
+            super().__init__(product_id, name, price, stock)
+            self.download_size = float(download_size)  # Size in MB
+
+        def display_information(self) -> None:
+            print(f" | Download Size: {self.download_size}MB", end=" ")
+
+        def get_fulfillment_info(self) -> str:
+            return f"Product is digital and can be delivered electronically. No shipping required, download size: {self.download_size} MB"
+
+        def to_dict(self) -> dict:
+            return {
+                "type": "digital",
+                "product_id": self._product_id,
+                "name": self.name,
+                "price": self._price,
+                "stock": self._stock,
+                "download_size": self.download_size
+            }
 
 class Inventory:
     def __init__(self):
