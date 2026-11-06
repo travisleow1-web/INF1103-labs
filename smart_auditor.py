@@ -1,26 +1,63 @@
-
+from abc import ABC, abstractmethod
 import json
 import os
 
-class Product:
-    def __init__(self, product_id, name, price, stock):
+class CanBeShipped(ABC):
+    @abstractmethod
+    def calculate_shipping_cost(self) -> float:
+        pass
+
+
+class Product(ABC):
+    def __init__(self, product_id: str, name: str, price: float, stock: int):
         self._product_id = product_id
         self.name = name
         self._price = float(price)
         self._stock = int(stock)
 
-    def update_stock(self, quantity):
+    def update_stock(self, quantity: int) -> None:
+        self._stock = quantity
+
+    def display_information(self) -> None:
+        print(f"ID: {self._product_id} | Name: {self.name} | Price: ${self._price:.2f} | Stock: {self._stock}", end=" ")
+
+    @abstractmethod
+    def get_fulfilment_info(self) -> str:
+        """Abstract method forcing subclasses to define fulfilment behavior."""
+        pass
+
+    @abstractmethod
+    def to_dict(self) -> dict:
+        """Abstract method to ensure subclasses export full attributes for JSON persistence."""
+        pass
+
+
+class Product:
+    def __init__(self, product_id: str, name: str, price: float, stock: int):
+        self._product_id = product_id
+        self.name = name
+        self._price = float(price)
+        self._stock = int(stock)
+
+    def update_stock(self, quantity: int) -> None:
         self._stock = quantity
 
     def display_information(self):
-        print(f"ID: {self._product_id} | Name: {self.name} | Price: ${self._price:.2f} | Stock: {self._stock}")
+        print(f"ID: {self._product_id} | Name: {self.name} | Price: ${self._price:.2f} | Stock: {self._stock}", end ="")
+
+
+    def get_fulfillment_info(self) -> str:
+        return f"Product requires physical shipping. Weight: {self._weight} kg" 
+
 
     def to_dict(self):
-        return {
+        return{
+            "type": "physical",
             "product_id": self._product_id,
             "name": self.name,
             "price": self._price,
-            "stock": self._stock
+            "stock": self._stock,
+            "weight": self.weight
         }
 
 class Inventory:
