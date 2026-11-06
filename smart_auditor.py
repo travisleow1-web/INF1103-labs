@@ -9,7 +9,7 @@ class CanBeShipped(ABC):
 
 
 class Product(ABC):
-    def __init__(self, product_id: str, name: str, price: float, stock: int):
+    def __init__(self, product_id: str, name: str, price: float, stock: int, weight: float = 0.0):
         self._product_id = product_id
         self.name = name
         self._price = float(price)
@@ -32,12 +32,10 @@ class Product(ABC):
         pass
 
 
-class Product:
-    def __init__(self, product_id: str, name: str, price: float, stock: int):
-        self._product_id = product_id
-        self.name = name
-        self._price = float(price)
-        self._stock = int(stock)
+class PhysicalProduct(Product, CanBeShipped):
+    def __init__(self, product_id: str, name: str, price: float, stock: int, weight: float):
+        super().__init__(product_id, name, price, stock)
+        self._weight = float(weight)  # Default weight in kg
 
     def update_stock(self, quantity: int) -> None:
         self._stock = quantity
@@ -50,14 +48,14 @@ class Product:
         return f"Product requires physical shipping. Weight: {self._weight} kg" 
 
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         return{
-            "type": "physical",
+            "type": "physical", 
             "product_id": self._product_id,
             "name": self.name,
             "price": self._price,
             "stock": self._stock,
-            "weight": self.weight
+            "weight": self._weight
         }
 
 class Inventory:
