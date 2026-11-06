@@ -157,12 +157,22 @@ def main():
             inventory.display_all()
             
         elif choice == '2':
-            pid = input("Enter Product ID: ")
-            name = input("Enter Product Name: ")
+            p_type = input("Enter product type (1. Physical / 2. Digital): ").strip()
+            pid = input("Enter Product ID: ").strip()
+            name = input("Enter Product Name: ").strip()
             price = float(input("Enter Price: "))
             stock = int(input("Enter Stock Quantity: "))
-            
-            new_product = Product(pid, name, price, stock)
+
+            if p_type == '1':
+                weight = float(input("Enter Weight (kg): "))
+                new_product = PhysicalProduct(pid, name, price, stock, weight)
+            elif p_type == '2':
+                download_size = float(input("Enter Download Size (MB): "))
+                new_product = DigitalProduct(pid, name, price, stock, download_size)
+            else:
+                print("Invalid product type.")
+                continue
+
             inventory.add_product(new_product)
             print(f"Product {name} added successfully.")
             
@@ -177,10 +187,13 @@ def main():
                 print("Product not found.")
                 
         elif choice == '4':
-            pid = input("Enter Product ID to search: ")
+            pid = input("Enter Product ID to search: ").strip()
             product = inventory.search_product(pid)
             if product:
                 product.display_information()
+                print(f"Fulfilment: {product.get_fulfilment_info()}")
+                if isinstance(product, CanBeShipped):
+                    print(f"Shipping Cost: ${product.calculate_shipping_cost():.2f}")
             else:
                 print("Product not found.")
                 
