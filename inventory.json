@@ -1,7 +1,8 @@
-{
-    "IP 1003": {
-        "name": "Gameboy",
-        "price": 49.99,
-        "stock": 20
+[
+    {
+        "product_id": "1101",
+        "name": "chocolate",
+        "price": 4.9,
+        "stock": 150
     }
-}
+]
