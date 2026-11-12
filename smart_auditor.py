@@ -42,15 +42,15 @@ class Product(ABC):
 
 
 class PhysicalProduct(Product, CanBeShipped):
-    def __init__(self, product_id: str, name: str, price: float, stock: int, weight: float):
-        super().__init__(product_id, name, price, stock)
+    def __init__(self, product_id: str, name: str, price: float, stock: int, supplier: Supplier, weight: float):
+        super().__init__(product_id, name, price, stocks, supplier)
         self._weight = float(weight)  # Default weight in kg
 
     def update_stock(self, quantity: int) -> None:
         self._stock = quantity
 
     def display_information(self):
-        print(f"ID: {self._product_id} | Name: {self.name} | Price: ${self._price:.2f} | Stock: {self._stock}", end ="")
+        print(f"ID: {self._product_id} | Name: {self.name} | Price: ${self._price:.2f} | Stock: {self._stock} | Supplier: {self.supplier.name if self.supplier else 'N/A'}", end=" ")
 
     def get_fulfilment_info(self) -> str:
         return f"Product requires physical shipping. Weight: {self._weight} kg"
