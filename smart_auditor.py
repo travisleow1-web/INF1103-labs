@@ -197,11 +197,22 @@ def load_inventory(filename="inventory.json")-> Inventory:
         print("No existing inventory file found. Starting fresh.")
     return inventory
 
-def save_inventory(inventory, filename="inventory.json"):
+def save_inventory(inventory: Inventory, filename: str ="inventory.json"):
     data = [p.to_dict() for p in inventory.products]
     with open(filename, 'w') as file:
         json.dump(data, file, indent=4)
     print("Inventory saved successfully.")
+
+
+def relationship_demo():
+    print ("=== Lab 8 Relationship Demonstration ===")
+    sup = supplier = Supplier("S001", "Tech Supplies Inc.", "contact@techsupplies.com")
+    p1 = PhysicalProduct("1001", "Laptop", 999.99, 10, supplier, 2.5)
+    p2 = DigitalProduct("2001", "E-Book", 19.99, 100, supplier, 5.0)
+    del sup  # Explicitly delete the supplier reference to demonstrate relationship handling
+    show_product_details(p1)
+    show_product_details(p2)
+    
 
 
 # main.py (Append this to the bottom of your file)
