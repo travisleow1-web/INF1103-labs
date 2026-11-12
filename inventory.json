@@ -1,8 +1,11 @@
 [
     {
-        "product_id": "1101",
-        "name": "chocolate",
-        "price": 4.9,
         "stock": 150
+        "type": "digital",
+        "product_id": "2204",
+        "name": "Tran",
+        "price": 24.0,
+        "stock": 20,
+        "download_size": 200.0
     }
 ]
