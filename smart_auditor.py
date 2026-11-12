@@ -212,7 +212,16 @@ def relationship_demo():
     del sup  # Explicitly delete the supplier reference to demonstrate relationship handling
     show_product_details(p1)
     show_product_details(p2)
-    
+
+    #2 Aggregation tests 
+    inv_1 = Inventory()
+    inv_2 = Inventory()
+    inv_1.add_product(p1)
+    inv_1 .remove_product("1001")
+    inv_2.add_product(p1)
+    print("Product transferred from inv_1 to inv_2. Current inventories:")
+    inv_1.display_all()
+    inv_2.display_all()
 
 
 # main.py (Append this to the bottom of your file)
