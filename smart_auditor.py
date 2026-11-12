@@ -164,7 +164,13 @@ class Order:
 
     def calculate_order_total(self) -> float:
         return sum(line.calculate_line_total() for line in self.order_lines)
-    
+
+    def display_order(self) -> None:
+        print(f"Order ID: {self.order_id}")
+        for line in self.order_lines:
+            print(f" - {line.product.name} x {line.quantity} = ${line.calculate_line_total():.2f}")
+        print(f"Total Order Cost: ${self.calculate_order_total():.2f}")
+        
 def load_inventory(filename="inventory.json")-> Inventory:
     inventory = Inventory()
     if os.path.exists(filename):
