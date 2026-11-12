@@ -43,7 +43,7 @@ class Product(ABC):
 
 class PhysicalProduct(Product, CanBeShipped):
     def __init__(self, product_id: str, name: str, price: float, stock: int, supplier: Supplier, weight: float):
-        super().__init__(product_id, name, price, stocks, supplier)
+        super().__init__(product_id, name, price, stock, supplier)
         self._weight = float(weight)  # Default weight in kg
 
     def update_stock(self, quantity: int) -> None:
@@ -70,13 +70,18 @@ class PhysicalProduct(Product, CanBeShipped):
             "name": self.name,
             "price": self._price,
             "stock": self._stock,
-            "weight": self._weight
+            "weight": self._weight,
+            "supplier": {
+                "supplier_id": self.supplier.supplier_id if self.supplier else None,
+                "name": self.supplier.name if self.supplier else None,
+                "contact_email": self.supplier.contact_email if self.supplier else None
+        }
         }
 
 
 class DigitalProduct(Product):
-    def __init__(self, product_id: str, name: str, price: float, stock: int, download_size: float):
-        super().__init__(product_id, name, price, stock)
+    def __init__(self, product_id: str, name: str, price: float, stock: int, download_size: float, supplier: Supplier = None):
+        super().__init__(product_id, name, price, stock, supplier)
         self.download_size = float(download_size)  # Size in MB
 
     def display_information(self) -> None:
@@ -95,7 +100,12 @@ class DigitalProduct(Product):
             "name": self.name,
             "price": self._price,
             "stock": self._stock,
-            "download_size": self.download_size
+            "download_size": self.download_size,
+            "supplier": {
+                "supplier_id": self.supplier.supplier_id if self.supplier else None,
+                "name": self.supplier.name if self.supplier else None,
+                "contact_email": self.supplier.contact_email if self.supplier else None
+            }
         }
 
 class Inventory:
