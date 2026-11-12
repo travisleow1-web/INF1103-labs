@@ -110,12 +110,19 @@ class DigitalProduct(Product):
 
 class Inventory:
     def __init__(self):
-        self.products = []
+        self.products : list[Product] = []
 
-    def add_product(self, product):
+    def add_product(self, product: Product) -> None:
         self.products.append(product)
 
-    def search_product(self, product_id:str):
+    def remove_product(self, product_id: str) -> bool:
+        product = self.search_product(product_id)
+        if product:
+            self.products.remove(product)
+            return True
+        return False
+
+    def search_product(self, product_id:str) -> Product | None:
         for p in self.products:
             if p._product_id == product_id:
                 return p
