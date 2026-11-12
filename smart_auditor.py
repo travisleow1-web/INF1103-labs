@@ -135,7 +135,16 @@ class Inventory:
             for p in self.products:
                 p.display_information()
 
+class OrderLine:
+    def __init__(self, product: Product, quantity: int):
+        self.product: Product = product
+        self.quantity: int = int(quantity)
 
+    def calculate_line_total(self) -> float:
+        return self.product._price * self.quantity 
+
+    def display_order_line(self):
+        print(f"Product ID: {self.product._product_id} | Name: {self.product.name} | Quantity: {self.quantity} | Price per unit: ${self.product._price:.2f}")
 
 def load_inventory(filename="inventory.json")-> Inventory:
     inventory = Inventory()
