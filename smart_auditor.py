@@ -223,7 +223,16 @@ def relationship_demo():
     inv_1.display_all()
     inv_2.display_all()
 
-
+    #3 Composition tests
+    order1 = Order("ORD001")
+    order2 = Order("ORD002")
+    order1.add_order_line(p1, 2)
+    order2.add_order_line(p2, 1)
+    order2.add_order_line(p1, 1)
+    print(f"Are the products the same for both orders?{order1.order_lines[0].product is order2.order_lines[0].product}")
+    print(f"Are the products different for the respective orders? {order1.order_lines[0].product is not order2.order_lines[1].product}")
+    order1.display_order()
+    order2.display_order
 # main.py (Append this to the bottom of your file)
 
 def main():
