@@ -170,7 +170,12 @@ class Order:
         for line in self.order_lines:
             print(f" - {line.product.name} x {line.quantity} = ${line.calculate_line_total():.2f}")
         print(f"Total Order Cost: ${self.calculate_order_total():.2f}")
-        
+
+def show_product_details(product: Product) -> None:
+    product.display_information()
+    print(product.get_fulfilment_info())
+
+
 def load_inventory(filename="inventory.json")-> Inventory:
     inventory = Inventory()
     if os.path.exists(filename):
@@ -178,10 +183,12 @@ def load_inventory(filename="inventory.json")-> Inventory:
             try:
                 data = json.load(file)
                 for item in data:
+                    sup_data = item.get('supplier', {"supplier_id": "S000", "name": "Default Supplier", "contact_email": "support@example.com"})
+                    supplier = Supplier(sup_data['supplier_id'], sup_data['name'], sup_data['contact_email'])
                     if item['type'] == 'physical':
-                        prod = PhysicalProduct(item['product_id'], item['name'], item['price'], item['stock'], item.get('weight', 0.0))
+                        prod = PhysicalProduct(item['product_id'], item['name'], item['price'], item['stock'], supplier, item.get('weight', 0.0))
                     elif item['type'] == 'digital':
-                        prod = DigitalProduct(item['product_id'], item['name'], item['price'], item['stock'], item.get('download_size', 0.0))
+                        prod = DigitalProduct(item['product_id'], item['name'], item['price'], item['stock'], supplier, item.get('download_size', 0.0))
                     inventory.add_product(prod)
                 print("Inventory loaded successfully.")
             except json.JSONDecodeError:
