@@ -241,13 +241,16 @@ def main():
     while True:
         print("\n--- Inventory Management System ---")
         print("1. Display all products")
-        print("2. Add a product")
-        print("3. Update stock")
-        print("4. Search for a product")
-        print("5. Save inventory")
-        print("6. Exit")
-        
-        choice = input("Enter your choice (1-6): ")
+        print("2. Add a product (with supplier details)")
+        print("3. Remove a product")
+        print("4. Update stock quantity for a product")
+        print("5. Create & Calculate Sample Order")
+        print("6. Search for a product & view details")
+        print("7. Save inventory")
+        print("8. Run Lab 8 Relationship Demonstration")
+        print("9. Exit")
+
+        choice = input("Enter your choice (1-9): ")
 
         if choice == '1':
             inventory.display_all()
@@ -258,21 +261,33 @@ def main():
             name = input("Enter Product Name: ").strip()
             price = float(input("Enter Price: "))
             stock = int(input("Enter Stock Quantity: "))
+            s_id = input("Enter Supplier ID: ").strip()
+            s_name = input("Enter Supplier Name: ").strip()
+            s_email = input("Enter Supplier Contact Email: ").strip()
+            supplier = Supplier(s_id, s_name, s_email)
 
             if p_type == '1':
                 weight = float(input("Enter Weight (kg): "))
-                new_product = PhysicalProduct(pid, name, price, stock, weight)
+                new_product = PhysicalProduct(pid, name, price, stock,supplier, weight)
             elif p_type == '2':
                 download_size = float(input("Enter Download Size (MB): "))
-                new_product = DigitalProduct(pid, name, price, stock, download_size)
+                new_product = DigitalProduct(pid, name, price, stock, supplier, download_size)
             else:
                 print("Invalid product type.")
                 continue
 
             inventory.add_product(new_product)
             print(f"Product {name} added successfully.")
-            
+
         elif choice == '3':
+            pid = input("Enter Product ID to remove: ").strip()
+            if inventory.remove_product(pid):
+                print("Product removed successfully.")
+            else:
+                print("Product not found.")
+                continue
+            
+        elif choice == '4':
             pid = input("Enter Product ID to update: ")
             product = inventory.search_product(pid)
             if product:
@@ -281,8 +296,22 @@ def main():
                 print("Stock updated successfully.")
             else:
                 print("Product not found.")
-                
-        elif choice == '4':
+
+        elif choice == '5':
+                    order_id = input("Enter Order ID: ").strip()
+                    order = Order(order_id)
+                    while True:
+                        pid = input("Enter Product ID to add to order (or 'done' to finish): ").strip()
+                        if pid.lower() == 'done':
+                            break
+                        product = inventory.search_product(pid)
+                        if product:
+                            quantity = int(input(f"Enter quantity for {product.name}: "))
+                            order.add_order_line(product, quantity)
+                        else:
+                            print("Product not found.")     
+
+        elif choice == '6':
             pid = input("Enter Product ID to search: ").strip()
             product = inventory.search_product(pid)
             if product:
@@ -292,16 +321,23 @@ def main():
                     print(f"Shipping Cost: ${product.calculate_shipping_cost():.2f}")
             else:
                 print("Product not found.")
-                
-        elif choice == '5':
+
+
+            print("\nOrder Summary:")
+            order.display_order()
+
+        elif choice == '7':
             save_inventory(inventory)
+
+        elif choice == '8':
+            relationship_demo()
             
-        elif choice == '6':
+        elif choice == '9':
             print("Exiting system...")
             break
             
         else:
-            print("Invalid input. Please enter a number between 1 and 6.")
+            print("Invalid input. Please enter a number between 1 and 9.")
 
 if __name__ == "__main__":
     main()
