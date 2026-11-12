@@ -1,6 +1,14 @@
 from abc import ABC, abstractmethod
 import json
 import os
+class Supplier:
+    def __init__(self, supplier_id: str,name: str, contact_email: str):
+        self.supplier_id:str = supplier_id
+        self.name: str = name
+        self.contact_email: str = contact_email
+
+    def display_supplier_info(self) -> None:
+        print(f"Supplier Name: {self.name} , ID: {self.supplier_id} | Contact Email: {self.contact_email}")
 
 class CanBeShipped(ABC):
     @abstractmethod
@@ -9,17 +17,18 @@ class CanBeShipped(ABC):
 
 
 class Product(ABC):
-    def __init__(self, product_id: str, name: str, price: float, stock: int, weight: float = 0.0):
+    def __init__(self, product_id: str, name: str, price: float, stock: int, weight: float = 0.0, supplier: Supplier = None):
         self._product_id = product_id
         self.name = name
         self._price = float(price)
         self._stock = int(stock)
+        self.supplier: Supplier = supplier
 
     def update_stock(self, quantity: int) -> None:
         self._stock = quantity
 
     def display_information(self) -> None:
-        print(f"ID: {self._product_id} | Name: {self.name} | Price: ${self._price:.2f} | Stock: {self._stock}", end=" ")
+        print(f"ID: {self._product_id} | Name: {self.name} | Price: ${self._price:.2f} | Stock: {self._stock} | Supplier: {self.supplier.name if self.supplier else 'N/A'}", end=" ")
 
     @abstractmethod
     def get_fulfilment_info(self) -> str:
