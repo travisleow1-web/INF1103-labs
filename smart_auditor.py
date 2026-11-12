@@ -146,6 +146,25 @@ class OrderLine:
     def display_order_line(self):
         print(f"Product ID: {self.product._product_id} | Name: {self.product.name} | Quantity: {self.quantity} | Price per unit: ${self.product._price:.2f}")
 
+class Order:
+    def __init__(self, order_id: str):
+        self.order_id: str = order_id
+        self.order_lines: list[OrderLine] = [] 
+
+    def add_order_line(self, product: Product, quantity: int) -> None:
+        order_line = OrderLine(product, quantity)
+        self.order_lines.append(order_line)
+
+    def remove_order_line(self, product_id: str) -> bool:
+        for line in self.order_lines:
+            if line.product._product_id == product_id:
+                self.order_lines.remove(line)
+                return True
+        return False
+
+    def calculate_order_total(self) -> float:
+        return sum(line.calculate_line_total() for line in self.order_lines)
+    
 def load_inventory(filename="inventory.json")-> Inventory:
     inventory = Inventory()
     if os.path.exists(filename):
