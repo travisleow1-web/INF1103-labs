@@ -7,7 +7,6 @@ class DiscountStrategy(ABC):
     def apply(self, total: float) -> float:
         pass
 
-
 class NoDiscount(DiscountStrategy):
     def apply(self, total: float) -> float:
         return total
@@ -21,7 +20,6 @@ class PercentageDiscount(DiscountStrategy):
     def apply(self, total: float) -> float:
         return total * (1 - self.percentage / 100.0)
 
-
 class BulkDiscount(DiscountStrategy):
     def __init__(self, threshold: float, amount: float):
         self.threshold: float = float(threshold)
@@ -30,10 +28,9 @@ class BulkDiscount(DiscountStrategy):
     def apply(self, total: float) -> float:
         return max(0.0, total - self.amount) if total >= self.threshold else total
 
-
 class StudentDiscount(DiscountStrategy):
     def apply(self, total: float) -> float:
-        return total * 0.95  # 5% student discount
+        return total * 0.95  # 5% student discount   
 
 
 
