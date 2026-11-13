@@ -17,18 +17,19 @@ class CanBeShipped(ABC):
 
 
 class Product(ABC):
-    def __init__(self, product_id: str, name: str, price: float, stock: int, weight: float = 0.0, supplier: Supplier = None):
+    def __init__(self, product_id: str, name: str, price: float, stock: int, supplier: Supplier, weight: float = 0.0):
         self._product_id = product_id
         self.name = name
         self._price = float(price)
         self._stock = int(stock)
+        self._weight = float(weight)  # Default weight in kg
         self.supplier: Supplier = supplier
 
     def update_stock(self, quantity: int) -> None:
         self._stock = quantity
 
     def display_information(self) -> None:
-        print(f"ID: {self._product_id} | Name: {self.name} | Price: ${self._price:.2f} | Stock: {self._stock} | Supplier: {self.supplier.name if self.supplier else 'N/A'}", end=" ")
+        print(f"ID: {self._product_id} | Name: {self.name} | Price: ${self._price:.2f} | Stock: {self._stock} | Supplier: {self.supplier.name if self.supplier else 'N/A'}", end="")
 
     @abstractmethod
     def get_fulfilment_info(self) -> str:
@@ -50,7 +51,8 @@ class PhysicalProduct(Product, CanBeShipped):
         self._stock = quantity
 
     def display_information(self):
-        print(f"ID: {self._product_id} | Name: {self.name} | Price: ${self._price:.2f} | Stock: {self._stock} | Supplier: {self.supplier.name if self.supplier else 'N/A'}", end=" ")
+        super().display_information()
+        print(f"ID: {self._product_id} | Name: {self.name} | Price: ${self._price:.2f} | Stock: {self._stock} | Supplier: {self.supplier.name if self.supplier else 'N/A'}")
 
     def get_fulfilment_info(self) -> str:
         return f"Product requires physical shipping. Weight: {self._weight} kg"
@@ -80,12 +82,13 @@ class PhysicalProduct(Product, CanBeShipped):
 
 
 class DigitalProduct(Product):
-    def __init__(self, product_id: str, name: str, price: float, stock: int, download_size: float, supplier: Supplier = None):
+    def __init__(self, product_id: str, name: str, price: float, stock: int, supplier: Supplier, download_size: float):
         super().__init__(product_id, name, price, stock, supplier)
         self.download_size = float(download_size)  # Size in MB
 
     def display_information(self) -> None:
-        print(f" | Download Size: {self.download_size}MB", end=" ")
+        super().display_information()
+        print(f" | Download Size: {self.download_size}MB")
 
     def get_fulfilment_info(self) -> str:
         return f"Product is digital and can be delivered electronically. No shipping required, download size: {self.download_size} MB"
@@ -232,7 +235,7 @@ def relationship_demo():
     print(f"Are the products the same for both orders?{order1.order_lines[0].product is order2.order_lines[0].product}")
     print(f"Are the products different for the respective orders? {order1.order_lines[0].product is not order2.order_lines[1].product}")
     order1.display_order()
-    order2.display_order
+    order2.display_order()
 # main.py (Append this to the bottom of your file)
 
 def main():
@@ -278,11 +281,13 @@ def main():
 
             inventory.add_product(new_product)
             print(f"Product {name} added successfully.")
+            continue
 
         elif choice == '3':
             pid = input("Enter Product ID to remove: ").strip()
             if inventory.remove_product(pid):
                 print("Product removed successfully.")
+                continue
             else:
                 print("Product not found.")
                 continue
@@ -294,22 +299,27 @@ def main():
                 new_stock = int(input("Enter the new stock quantity: "))
                 product.update_stock(new_stock)
                 print("Stock updated successfully.")
+                continue
             else:
                 print("Product not found.")
+                continue
 
         elif choice == '5':
-                    order_id = input("Enter Order ID: ").strip()
-                    order = Order(order_id)
-                    while True:
-                        pid = input("Enter Product ID to add to order (or 'done' to finish): ").strip()
-                        if pid.lower() == 'done':
-                            break
-                        product = inventory.search_product(pid)
-                        if product:
-                            quantity = int(input(f"Enter quantity for {product.name}: "))
-                            order.add_order_line(product, quantity)
-                        else:
-                            print("Product not found.")     
+            order_id = input("Enter Order ID: ").strip()
+            order = Order(order_id)
+            while True:
+                pid = input("Enter Product ID to add to order (or 'done' to finish): ").strip()
+                if pid.lower() == 'done':
+                    break
+                product = inventory.search_product(pid)
+                if product:
+                    quantity = int(input(f"Enter quantity for {product.name}: "))
+                    order.add_order_line(product, quantity)
+                else:
+                    print("Product not found.")
+
+            print("\nOrder Summary:")
+            order.display_order()
 
         elif choice == '6':
             pid = input("Enter Product ID to search: ").strip()
@@ -322,16 +332,14 @@ def main():
             else:
                 print("Product not found.")
 
-
-            print("\nOrder Summary:")
-            order.display_order()
-
         elif choice == '7':
             save_inventory(inventory)
+            continue
 
         elif choice == '8':
             relationship_demo()
-            
+            continue
+
         elif choice == '9':
             print("Exiting system...")
             break
