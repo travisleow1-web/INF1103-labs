@@ -274,7 +274,7 @@ def get_positive_int(prompt: str) -> int:
         except ValueError as e:
             print(f"Invalid input: {e}. Please enter a valid integer.")
 
-def get_non_negativeint(prompt: str) -> int:
+def get_non_negative_int(prompt: str) -> int:
     while True:
         try:
             value = int(input(prompt))
@@ -387,9 +387,10 @@ def main():
         print("6. Search for a product & view details")
         print("7. Save inventory")
         print("8. Run Lab 8 Relationship Demonstration")
-        print("9. Exit")
+        print("9. Import products from CSV file")
+        print("10. Exit")
 
-        choice = input("Enter your choice (1-9): ")
+        choice = input("Enter your choice (1-10): ")
 
         if choice == '1':
             inventory.display_all()
@@ -398,26 +399,21 @@ def main():
             p_type = input("Enter product type (1. Physical / 2. Digital): ").strip()
             pid = input("Enter Product ID: ").strip()
             name = input("Enter Product Name: ").strip()
-            price = float(input("Enter Price: "))
-            stock = int(input("Enter Stock Quantity: "))
+            price = get_positive_float(input("Enter Price: "))
+            stock = get_non_negative_int(input("Enter Stock Quantity: "))
             s_id = input("Enter Supplier ID: ").strip()
             s_name = input("Enter Supplier Name: ").strip()
             s_email = input("Enter Supplier Contact Email: ").strip()
             supplier = Supplier(s_id, s_name, s_email)
+            extra_prompt = "Enter Weight (kg): " if p_type == 'physical' else "Enter Download Size (MB): "
+            extra = get_positive_float(extra_prompt)
 
-            if p_type == '1':
-                weight = float(input("Enter Weight (kg): "))
-                new_product = PhysicalProduct(pid, name, price, stock,supplier, weight)
-            elif p_type == '2':
-                download_size = float(input("Enter Download Size (MB): "))
-                new_product = DigitalProduct(pid, name, price, stock, supplier, download_size)
-            else:
-                print("Invalid product type.")
-                continue
-
-            inventory.add_product(new_product)
-            print(f"Product {name} added successfully.")
-            continue
+            try:
+                new_product = ProductFactory.create(p_type, pid, name, price, stock, supplier, extra)
+                inventory.add_product(new_product)
+                print(f"Product {name} added successfully.")
+            except ValueError as err:
+                print(f"Could not create product: {err}")
 
         elif choice == '3':
             pid = input("Enter Product ID to remove: ").strip()
@@ -432,7 +428,7 @@ def main():
             pid = input("Enter Product ID to update: ")
             product = inventory.search_product(pid)
             if product:
-                new_stock = int(input("Enter the new stock quantity: "))
+                new_stock = get_non_negative_int(input("Enter the new stock quantity: "))
                 product.update_stock(new_stock)
                 print("Stock updated successfully.")
                 continue
@@ -449,10 +445,19 @@ def main():
                     break
                 product = inventory.search_product(pid)
                 if product:
-                    quantity = int(input(f"Enter quantity for {product.name}: "))
+                    quantity = get_positive_int(input(f"Enter quantity for {product.name}: "))
                     order.add_order_line(product, quantity)
                 else:
                     print("Product not found.")
+
+            print("Select Discount Strategy: 1. None | 2. 10% Off | 3. Bulk ($20 off $200+) | 4. Student (5% Off)")
+            d_choice = input("Choice: ").strip()
+            if d_choice == "2":
+                order.set_discount(PercentageDiscount(10))
+            elif d_choice == "3":
+                order.set_discount(BulkDiscount(200, 20))
+            elif d_choice == "4":
+                order.set_discount(StudentDiscount())
 
             print("\nOrder Summary:")
             order.display_order()
@@ -476,7 +481,12 @@ def main():
             relationship_demo()
             continue
 
-        elif choice == '9':
+        elif choice == "9":
+            path = input("Enter CSV filename (default 'products.csv'): ").strip() or "products.csv"
+            default_sup = Supplier("S001", "CSV Import Supplier", "import@supplier.com")
+            load_products(path, inventory, default_sup)
+            
+        elif choice == '10':
             print("Exiting system...")
             break
             
