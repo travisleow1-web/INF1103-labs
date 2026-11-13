@@ -162,7 +162,26 @@ class DigitalProduct(Product):
                 "contact_email": self.supplier.contact_email if self.supplier else None
             }
         }
-
+        
+class ProductFactory:
+    @staticmethod
+    def create(
+        product_type: str,
+        product_id: str,
+        name: str,
+        price: float,
+        stock_quantity: int,
+        supplier: Supplier | None = None,
+        extra_attr: float = 1.0,
+    ) -> Product:
+        p_type = product_type.strip().lower()
+        if p_type == "physical":
+            return PhysicalProduct(product_id, name, price, stock_quantity, supplier, extra_attr)
+        elif p_type == "digital":
+            return DigitalProduct(product_id, name, price, stock_quantity, supplier, extra_attr)
+        else:
+            raise ValueError(f"Unknown product type: {product_type}")
+        
 class Inventory:
     def __init__(self):
         self.products : list[Product] = []
