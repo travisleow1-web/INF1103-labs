@@ -32,9 +32,6 @@ class StudentDiscount(DiscountStrategy):
     def apply(self, total: float) -> float:
         return total * 0.95  # 5% student discount   
 
-
-
-
 class Supplier:
     def __init__(self, supplier_id: str,name: str, contact_email: str):
         self.supplier_id:str = supplier_id
@@ -52,12 +49,27 @@ class CanBeShipped(ABC):
 
 class Product(ABC):
     def __init__(self, product_id: str, name: str, price: float, stock: int, supplier: Supplier, weight: float = 0.0):
+        price_val = float(price)
+        stock_val = int(stock)
+        if price_val < 0:
+           raise ValueError("Price cannot be negative.")
+        if stock_val < 0:
+           raise ValueError("Stock cannot be negative.")
+
         self._product_id = product_id
         self.name = name
         self._price = float(price)
         self._stock = int(stock)
         self._weight = float(weight)  # Default weight in kg
         self.supplier: Supplier = supplier
+
+    @property
+    def product_id(self) -> str:
+        return self._product_id
+
+    @property
+    def price(self) -> float:
+        return self._price
 
     def update_stock(self, quantity: int) -> None:
         self._stock = quantity
@@ -79,6 +91,9 @@ class Product(ABC):
 class PhysicalProduct(Product, CanBeShipped):
     def __init__(self, product_id: str, name: str, price: float, stock: int, supplier: Supplier, weight: float):
         super().__init__(product_id, name, price, stock, supplier)
+        weight_val = float(weight)
+        if weight_val < 0:
+            raise ValueError("Weight cannot be negative.")
         self._weight = float(weight)  # Default weight in kg
 
     def update_stock(self, quantity: int) -> None:
@@ -118,6 +133,9 @@ class PhysicalProduct(Product, CanBeShipped):
 class DigitalProduct(Product):
     def __init__(self, product_id: str, name: str, price: float, stock: int, supplier: Supplier, download_size: float):
         super().__init__(product_id, name, price, stock, supplier)
+        size_val = float(download_size)
+        if size_val < 0:    
+            raise ValueError("Download size cannot be negative.")
         self.download_size = float(download_size)  # Size in MB
 
     def display_information(self) -> None:
