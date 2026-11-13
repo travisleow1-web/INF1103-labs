@@ -211,8 +211,11 @@ class Inventory:
 
 class OrderLine:
     def __init__(self, product: Product, quantity: int):
+        if quantity < 0:
+            raise ValueError("Quantity cannot be negative.")
         self.product: Product = product
         self.quantity: int = int(quantity)
+        
 
     def calculate_line_total(self) -> float:
         return self.product._price * self.quantity 
@@ -221,10 +224,14 @@ class OrderLine:
         print(f"Product ID: {self.product._product_id} | Name: {self.product.name} | Quantity: {self.quantity} | Price per unit: ${self.product._price:.2f}")
 
 class Order:
-    def __init__(self, order_id: str):
+    def __init__(self, order_id: str, discount: DiscountStrategy | None = None):
         self.order_id: str = order_id
         self.order_lines: list[OrderLine] = [] 
+        self.discount: DiscountStrategy = discount if discount is not None else NoDiscount()
 
+    def set_discount(self, discount: DiscountStrategy) -> None:
+        self.discount = discount
+        
     def add_order_line(self, product: Product, quantity: int) -> None:
         order_line = OrderLine(product, quantity)
         self.order_lines.append(order_line)
@@ -237,7 +244,8 @@ class Order:
         return False
 
     def calculate_order_total(self) -> float:
-        return sum(line.calculate_line_total() for line in self.order_lines)
+        total = sum(line.calculate_line_total() for line in self.order_lines)
+        return self.discount.get_discounted_total(total)
 
     def display_order(self) -> None:
         print(f"Order ID: {self.order_id}")
@@ -245,6 +253,37 @@ class Order:
             print(f" - {line.product.name} x {line.quantity} = ${line.calculate_line_total():.2f}")
         print(f"Total Order Cost: ${self.calculate_order_total():.2f}")
 
+def get_positive_float(prompt: str) -> float:
+    while True:
+        try:
+            value = float(input(prompt))
+            if value < 0:
+                raise ValueError("Value must be non-negative.")
+            return value
+        except ValueError as e:
+            print(f"Invalid input: {e}. Please enter a valid number.")
+
+def get_positive_int(prompt: str) -> int:
+    while True:
+        try:
+            value = int(input(prompt))
+            if value < 0:
+                raise ValueError("Value must be a positive integer.")
+            return value
+        except ValueError as e:
+            print(f"Invalid input: {e}. Please enter a valid integer.")
+
+def get_non_negativeint(prompt: str) -> int:
+    while True:
+        try:
+            value = int(input(prompt))
+            if value < 0:
+                raise ValueError("Value must be a non-negative integer.")
+            return value
+        except ValueError as e:
+            print(f"Invalid input: {e}. Please enter a valid integer.")
+
+            
 def show_product_details(product: Product) -> None:
     product.display_information()
     print(product.get_fulfilment_info())
