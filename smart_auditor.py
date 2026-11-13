@@ -1,6 +1,43 @@
 from abc import ABC, abstractmethod
 import json
 import os
+
+class DiscountStrategy(ABC):
+    @abstractmethod
+    def apply(self, total: float) -> float:
+        pass
+
+
+class NoDiscount(DiscountStrategy):
+    def apply(self, total: float) -> float:
+        return total
+
+class PercentageDiscount(DiscountStrategy):
+    def __init__(self, percentage: float):
+        if percentage < 0 or percentage > 100:
+            raise ValueError("Percentage must be between 0 and 100.")
+        self.percentage: float = float(percentage)
+
+    def apply(self, total: float) -> float:
+        return total * (1 - self.percentage / 100.0)
+
+
+class BulkDiscount(DiscountStrategy):
+    def __init__(self, threshold: float, amount: float):
+        self.threshold: float = float(threshold)
+        self.amount: float = float(amount)
+
+    def apply(self, total: float) -> float:
+        return max(0.0, total - self.amount) if total >= self.threshold else total
+
+
+class StudentDiscount(DiscountStrategy):
+    def apply(self, total: float) -> float:
+        return total * 0.95  # 5% student discount
+
+
+
+
 class Supplier:
     def __init__(self, supplier_id: str,name: str, contact_email: str):
         self.supplier_id:str = supplier_id
