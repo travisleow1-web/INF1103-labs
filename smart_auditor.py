@@ -324,12 +324,10 @@ def load_inventory(filename="inventory.json")-> Inventory:
             try:
                 data = json.load(file)
                 for item in data:
-                    sup_data = item.get('supplier', {"supplier_id": "S000", "name": "Default Supplier", "contact_email": "support@example.com"})
-                    supplier = Supplier(sup_data['supplier_id'], sup_data['name'], sup_data['contact_email'])
-                    if item['type'] == 'physical':
-                        prod = PhysicalProduct(item['product_id'], item['name'], item['price'], item['stock'], supplier, item.get('weight', 0.0))
-                    elif item['type'] == 'digital':
-                        prod = DigitalProduct(item['product_id'], item['name'], item['price'], item['stock'], supplier, item.get('download_size', 0.0))
+                    sup_data = item.get("supplier") or {"supplier_id": "S000", "name": "Default Supplier", "contact_email": "support@example.com"}
+                    supplier = Supplier(sup_data["supplier_id"], sup_data["name"], sup_data["contact_email"])
+                    extra = item.get("weight", 1.0) if item.get("type") == "physical" else item.get("download_size", 10.0)
+                    prod = ProductFactory.create(item["type"], item["product_id"], item["name"], item["price"], item["stock"], supplier, extra)
                     inventory.add_product(prod)
                 print("Inventory loaded successfully.")
             except json.JSONDecodeError:
