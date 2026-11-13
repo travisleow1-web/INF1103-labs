@@ -491,7 +491,7 @@ def main():
             break
             
         else:
-            print("Invalid input. Please enter a number between 1 and 9.")
+            print("Invalid input. Please enter a number between 1 and 10.")
 
 if __name__ == "__main__":
     main()
