@@ -1,10 +1,15 @@
 [
     {
         "type": "digital",
-        "product_id": "2204",
-        "name": "Tran",
-        "price": 24.0,
-        "stock": 20,
-        "download_size": 200.0
+        "product_id": "421",
+        "name": "Game",
+        "price": 69.0,
+        "stock": 67,
+        "download_size": 2000.0,
+        "supplier": {
+            "supplier_id": "40",
+            "name": "Ubisoft",
+            "contact_email": "Ubisoft@gmail.com"
+        }
     }
 ]
