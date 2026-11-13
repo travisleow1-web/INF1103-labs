@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import json
 import os
+import csv
 
 class DiscountStrategy(ABC):
     @abstractmethod
@@ -287,6 +288,33 @@ def get_non_negativeint(prompt: str) -> int:
 def show_product_details(product: Product) -> None:
     product.display_information()
     print(product.get_fulfilment_info())
+
+
+def load_products(path: str, inventory: Inventory, supplier: Supplier) -> int:
+    loaded = 0
+    try:
+        file = open(path, newline="")
+    except FileNotFoundError:
+        print(f"Products file not found: {path}")
+    else:
+        with file:
+            reader = csv.reader(file)
+            next(reader, None)  # Skip header row
+            for row_num, row in enumerate(reader, start=2):
+                if len(row) < 5:
+                    print(f"Row {row_num} skipped: incomplete data.")
+                    continue
+                try:
+                    p_type, pid, name, price_str, stock_str = [col.strip() for col in row[:5]]
+                    prod = ProductFactory.create(p_type, pid, name, float(price_str), int(stock_str), supplier)
+                    inventory.add_product(prod)
+                    loaded += 1
+                except ValueError as err:
+                    print(f"Row {row_num} skipped ({row}): {err}")
+        print(f"{loaded} products loaded.")
+    finally:
+        print("Load attempt finished.")
+    return loaded
 
 
 def load_inventory(filename="inventory.json")-> Inventory:
